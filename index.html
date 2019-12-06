@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
   <style>
+
   #map {
     background: #057e5c;
     width: 100%;
@@ -114,7 +115,7 @@
 
   // request a mapbox raster tile layer and add to map
   L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}{r}.{ext}', {
-	attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+	attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>',
 	subdomains: 'abcd',
 	minZoom: 0,
 	maxZoom: 20,
@@ -159,7 +160,6 @@
           }
 
           container.onclick = function(){
-            console.log('buttonClicked');
             LocateUser();
           }
           return container;
@@ -174,13 +174,19 @@
 
        function onLocationFound(e) {
          // convert meters to feet
-         var radius = e.accuracy * 3.28084;
-         var feet = radius.toFixed(0);
+         var radius = e.accuracy;
+         var feet = (e.accuracy * 3.28084).toFixed(0);
 
          L.marker(e.latlng).addTo(map)
              .bindPopup("You are within " + feet + " feet of this point").openPopup();
 
-         L.circle(e.latlng, radius).addTo(map);
+         L.circle(e.latlng, radius, {
+              stroke: true,
+              weight: 1,
+              color: '#ffffff',
+              fillOpacity: .3,
+              fillColor: '#ffffff'
+         }).addTo(map);
   }
 
 

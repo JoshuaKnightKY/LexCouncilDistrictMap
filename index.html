@@ -14,45 +14,36 @@
     width: 100%;
   }
 
-  #locate-position{
-    position:absolute;
-    top:140px;
-    left:25px;
-    -webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
-    -moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
-    box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
-  }
-
   #title {
-    position: absolute;
-    bottom: 20px;
-    left: 15px;
-    width: 35;
-    padding: 6px 12px;
-    background: rgba(256, 256, 256, .80);
-    border: 1px solid #005d7e;
-    border-radius: 3px;
-    z-index: 800;
-    font-size: 1.6em;
+       position: absolute;
+       bottom: 20px;
+       left: 15px;
+       width: 35;
+       padding: 6px 12px;
+       background: rgba(256, 256, 256, .80);
+       border: 1px solid #005d7e;
+       border-radius: 3px;
+       z-index: 800;
+       font-size: 1.6em;
   }
 
   .leaflet-popup-tip,
   .leaflet-popup-content-wrapper {
-    z-index: 900;
+       z-index: 900;
   }
 
   .leaflet-touch .leaflet-control-layers-toggle {
-  background-image:url(images/layers.png);
-  width: 127px;
-  height: 44px;
-  background-size: 127px 44px;
+       background-image:url(images/layers.png);
+       width: 127px;
+       height: 44px;
+       background-size: 127px 44px;
   }
 
   .leaflet-retina .leaflet-control-layers-toggle {
-  background-image:url(images/layers.png);
-  width: 127px;
-  height: 44px;
-  background-size: 127px 44px;
+       background-image:url(images/layers.png);
+       width: 127px;
+       height: 44px;
+       background-size: 127px 44px;
   }
 
 
@@ -88,9 +79,14 @@
     <b>Council District 3 - Lexington</b>
   </section>
 
+  <div class="leaflet-top leaflet-left">
+       <button ion-button class="button-action" onclick="LocateUser()" block></button>
+  </div>
+
   <div id="map" class='viewport-full viewport-full-ml'></div>
 
-    <!-- load leaflet, omnivore, and mapapp script -->
+
+  <!-- load leaflet, omnivore, and mapapp script -->
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"></script>
@@ -98,7 +94,6 @@
   <script src='https://api.mapbox.com/mapbox.js/v3.2.1/mapbox.js'></script>
 
   <!-- Map script -->
-
   <script>
 
   // initialize map, centered on KY
@@ -116,7 +111,6 @@
 
   // mapbox API access Token
   var accessToken = 'pk.eyJ1Ijoia29uc29sdXMiLCJhIjoiY2pnd2d2dXJrMTk4MzMzcGRmNjl6enpmYyJ9.MC43t60Y6axGbi32YET_tA'
-
 
   // request a mapbox raster tile layer and add to map
   L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}{r}.{ext}', {
@@ -140,21 +134,58 @@
          style: districtStyle
   }).addTo(map);
 
-  // leaflet locate
-  map.locate({setView: false, maxZoom: 18});
+  // leaflet add locate user button
+  var LocationControl = L.Control.extend({
 
-  function onLocationFound(e) {
-    // convert meters to feet
-    var radius = e.accuracy * 3.28084;
-    var feet = radius.toFixed(0);
+       options: {
+            position: 'topleft'
+       },
 
-    L.marker(e.latlng).addTo(map)
-        .bindPopup("You are within " + feet + " feet of this point").openPopup();
+  // define style of locate user button
+       onAdd: function (map) {
+          var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
 
-    L.circle(e.latlng, radius).addTo(map);
+          container.style.backgroundImage = 'url(sym.png)';
+          container.style.width = '35px';
+          container.style.height = '35px';
+
+          container.onmouseover = function(){
+            container.style.backgroundImage = 'url(sym-hover.png)';
+            container.style.cursor = 'help';
+          }
+          container.onmouseout = function(){
+            container.style.backgroundImage = 'url(sym.png)';
+            container.style.cursor = 'grab';
+          }
+
+          container.onclick = function(){
+            console.log('buttonClicked');
+            LocateUser();
+          }
+          return container;
+        }
+  });
+
+  map.addControl( new LocationControl());
+
+  // leaflet locate function
+  function LocateUser(){
+       map.locate({setView: false, maxZoom: 18});
+
+       function onLocationFound(e) {
+         // convert meters to feet
+         var radius = e.accuracy * 3.28084;
+         var feet = radius.toFixed(0);
+
+         L.marker(e.latlng).addTo(map)
+             .bindPopup("You are within " + feet + " feet of this point").openPopup();
+
+         L.circle(e.latlng, radius).addTo(map);
+  }
+
+
+     map.on('locationfound', onLocationFound);
 }
-
-map.on('locationfound', onLocationFound);
 
 </script>
 
